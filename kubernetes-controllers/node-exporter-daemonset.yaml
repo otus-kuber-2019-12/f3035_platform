@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prometheus-node-exporter
+  labels:
+    k8s-app: prometheus
+    component: node-exporter
+spec:
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      k8s-app: prometheus
+      component: node-exporter
+  template:
+    metadata:
+      name: prometheus-node-exporter
+      labels:
+        k8s-app: prometheus
+        component: node-exporter
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: prometheus-node-exporter
+        image: rt7402/node-exporter:v0.18.1
+        volumeMounts:
+        - name: proc
+          mountPath: /host/proc
+        - name: sys
+          mountPath: /host/sys
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: rootfs
+        hostPath:
+          path: /
