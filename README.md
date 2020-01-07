@@ -201,3 +201,214 @@ prometheus-node-exporter-x2jdf   1/1     Running   0          6m   10.244.3.9   
 prometheus-node-exporter-mpddw   1/1     Running   0          6m   10.244.4.9   kind-worker2          <none>           <none>
 prometheus-node-exporter-nsw7r   1/1     Running   0          6m   10.244.5.9   kind-worker3          <none>           <none>
 ```
+
+## HW 03
+
+### task01
+- Создание сервисного аккаунта *bob*
+```console
+# kubectl apply -f 01-sa-bob.yaml
+```
+- Проверка
+```console
+# kubectl get sa bob
+NAME   SECRETS   AGE
+bob    1         4h51m
+```
+- Дать роль *admin* сервисному аккаунту *bob*
+```console
+# kubectl apply -f 02-binding-bob.yaml
+```
+- Проверка
+```console
+# kubectl get clusterrolebinding bob-admin -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    ...
+  name: bob-admin
+  resourceVersion: "2548"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/bob-admin
+  uid: b2928499-3f54-449f-b6da-7fe23374c308
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: bob
+  namespace: default
+```
+- Создание сервисного аккаунта *dave*
+```console
+# kubectl apply -f 03-sa-dave.yaml
+```
+- Проверка
+```console
+# kubectl get sa dave
+NAME   SECRETS   AGE
+dave   1         5h1m
+```
+
+### task02
+- Создание namespace *prometheus*
+```console
+# kubectl apply -f 01-namespace-prometheus.yaml
+```
+- Проверка
+```console
+# kubectl get ns prometheus
+NAME         STATUS   AGE
+prometheus   Active   165m
+```
+- Создание сервисного аккаунта *carol* в namespace *prometheus*
+```console
+# kubectl apply -f 02-sa-carol.yaml
+```
+- Проверка
+```console
+# kubectl get sa carol -n prometheus
+NAME    SECRETS   AGE
+carol   1         91m
+```
+- Создание роли кластера *prometheus-sa-ro* с возможностью выполнить **get, list, watch** для всех pods кластера
+```console
+# kubectl apply -f 03-crole-sa-prometheus-ro.yaml
+```
+- Проверка
+```console
+# kubectl get clusterrole prometheus-sa-ro -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    ...
+  name: prometheus-sa-ro
+  resourceVersion: "31856"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/prometheus-sa-ro
+  uid: 19574b68-b3e7-4923-9b17-7c3ffd50a580
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+```
+- Назначение роли *prometheus-sa-ro* для всех сервисных аккаунтов из namespace *prometheus*
+```console
+# kubectl apply -f 04-cbinding-sa-prometheus-ro.yaml
+```
+- Проверка
+```console
+# kubectl.exe get clusterrolebindings prometheus-sa-ro -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    ...
+  name: prometheus-sa-ro
+  resourceVersion: "32357"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/prometheus-sa-ro
+  uid: c6e92fdd-a7c7-46b0-8bfd-0c25feac20d4
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-sa-ro
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts:prometheus
+```
+
+### task03
+
+- Создание namespace *dev*
+```console
+# kubectl apply -f 01-namespace-dev.yaml
+```
+- Проверка
+```console
+# kubectl get ns dev
+NAME         STATUS   AGE
+dev    Active   77m
+```
+
+- Создание сервисного аккаунта *jane* в namespace *dev*
+```console
+# kubectl apply -f 02-sa-jane.yaml
+```
+- Проверка
+```console
+# kubectl get sa jane -n dev
+NAME    SECRETS   AGE
+jane   1         78m
+```
+
+- Назначить аккаунту *jane* роль *admin* в namespace *dev*
+```console
+# kubectl apply -f 03-binding-sa-jane-admin.yaml
+```
+- Проверка
+```console
+# kubectl get rolebinding jane-admin -n dev -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    ...
+  name: jane-admin
+  namespace: dev
+  resourceVersion: "35701"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/namespaces/dev/rolebindings/jane-admin
+  uid: c766d032-9b79-4802-aa3a-765d4758c434
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: jane
+  namespace: dev
+```
+
+- Создание сервисного аккаунта *ken* в namespace *dev*
+```console
+# kubectl apply -f 04-sa-ken.yaml
+```
+- Проверка
+```console
+# kubectl get sa ken -n dev
+NAME    SECRETS   AGE
+ken    1         75m
+```
+
+- Назначить аккаунту *ken* роль *view* в namespace *dev*
+```console
+# kubectl apply -f 05-binding-sa-ken-view.yaml
+```
+- Проверка
+```console
+# kubectl get rolebinding ken-view -n dev -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    ...
+  name: ken-view
+  namespace: dev
+  resourceVersion: "36464"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/namespaces/dev/rolebindings/ken-view
+  uid: 0c0ab55a-d852-4137-a04c-c3b4e7ef0246
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- kind: ServiceAccount
+  name: ken
+  namespace: dev
+```
