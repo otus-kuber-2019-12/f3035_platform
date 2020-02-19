@@ -1,7 +1,8 @@
 # f3035_platform
 f3035 Platform repository
 
-- [Homework01](docs/hw01.md)
-- [Homework02](docs/hw02.md)
-- [Homework03](docs/hw03.md)
-- [Homework04](docs/hw04.md)
+1. [kubernetes-intro](docs/hw01.md)
+2. [kubernetes-controllers](docs/hw02.md)
+3. [kubernetes-security](docs/hw03.md)
+4. [kubernetes-networks](docs/hw04.md)
+5. [kubernetes-volumes](docs/hw05.md)
