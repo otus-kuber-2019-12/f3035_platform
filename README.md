@@ -6,3 +6,4 @@ f3035 Platform repository
 3. [kubernetes-security](docs/hw03.md)
 4. [kubernetes-networks](docs/hw04.md)
 5. [kubernetes-volumes](docs/hw05.md)
+6. [kubernetes-templating](docs/hw06.md)
