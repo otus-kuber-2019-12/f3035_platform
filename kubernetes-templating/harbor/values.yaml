@@ -1,0 +1,16 @@
+expose:
+  type: ingress
+  tls:
+    enabled: true
+    secretName: "harbor.tdpr.org"
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      certmanager.k8s.io/cluster-issuer: "letsencrypt-production"
+      #certmanager.k8s.io/cluster-issuer: "letsencrypt-staging"
+    hosts:
+      core: harbor.tdpr.org
+notary:
+  enabled: false

@@ -1,0 +1,6 @@
+bases:
+- '../../base'
+nameSuffix: -prod
+namespace: hipster-shop-prod
+commonLabels:
+  environment: adservice-prod
