@@ -7,3 +7,4 @@ f3035 Platform repository
 4. [kubernetes-networks](docs/hw04.md)
 5. [kubernetes-volumes](docs/hw05.md)
 6. [kubernetes-templating](docs/hw06.md)
+7. [kubernetes-operators](docs/hw07.md)
